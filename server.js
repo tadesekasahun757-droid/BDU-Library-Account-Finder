@@ -7,9 +7,9 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const serviceAccount = require(
-  "D:/FirebaseKeys/bdu-library-account-finder-firebase-adminsdk-fbsvc-5bd75ebd45.json"
-);
+const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
+    ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+    : require("D:/FirebaseKeys/bdu-library-account-finder-firebase-adminsdk-fbsvc-5bd75ebd45.json");
 
 initializeApp({
   credential: cert(serviceAccount)
