@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDU Library Account Finder</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f4f9;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .container {
+            background: white;
+            max-width: 500px;
+            margin: auto;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #123b66;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #123b66;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        p {
+            color: #555;
+        }
+
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #eef5ff;
+            border: 1px solid #c5d9f2;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        #result h3 {
+            color: #123b66;
+            text-align: center;
+        }
+
+        #result p {
+            font-size: 16px;
+            margin: 12px 0;
+            overflow-wrap: anywhere;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h2>BAHIR DAR UNIVERSITY</h2>
+        <p>Library Account Services</p>
+    </header>
+
+    <div class="container">
+
+        <h1>BDU Library Account Finder</h1>
+
+        <p>Welcome to BDU Pre-Engineering Section 7.</p>
+        <p>Find information about your university library account.</p>
+
+        <form id="searchForm">
+
+            <input
+                type="text"
+                id="fullName"
+                placeholder="Enter your full name"
+                required
+            >
+
+            <br><br>
+
+            <input
+                type="text"
+                id="studentID"
+                placeholder="Enter your student ID"
+                required
+            >
+
+            <br><br>
+
+            <button type="submit" id="searchButton">
+                Search
+            </button>
+
+            <button type="reset">
+                Clear
+            </button>
+
+        </form>
+
+        <div id="result"></div>
+
+    </div>
+
+    <script>
+        const form = document.getElementById("searchForm");
+        const result = document.getElementById("result");
+        const searchButton = document.getElementById("searchButton");
+
+        form.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const fullName = document.getElementById("fullName").value.trim();
+            const studentID = document.getElementById("studentID").value.trim();
+
+            result.innerHTML = "<p>Searching...</p>";
+            searchButton.disabled = true;
+
+            try {
+                const response = await fetch("/search", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        fullName: fullName,
+                        studentID: studentID
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    result.innerHTML = `
+                        <h3>Student Found!</h3>
+                        <p><strong>Library Username:</strong> ${escapeHTML(data.username)}</p>
+                        <p><strong>Library Password:</strong> ${escapeHTML(data.password)}</p>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <p>${escapeHTML(data.message)}</p>
+                    `;
+                }
+
+            } catch (error) {
+                result.innerHTML = `
+                    <p>Unable to connect to the server. Please try again.</p>
+                `;
+            } finally {
+                searchButton.disabled = false;
+            }
+        });
+
+        form.addEventListener("reset", function() {
+            result.innerHTML = "";
+        });
+
+        function escapeHTML(value) {
+            return String(value).replace(/[&<>"']/g, function(char) {
+                return {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;"
+                }[char];
+            });
+        }
+    </script>
+
+</body>
+</html>
