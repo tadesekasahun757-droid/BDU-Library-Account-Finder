@@ -1,14 +1,16 @@
 
 const express = require("express");
+const fs = require("fs");
 const { initializeApp, cert } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
-const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
-    ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+  : process.env.FIREBASE_SERVICE_ACCOUNT_PATH
+    ? JSON.parse(fs.readFileSync(process.env.FIREBASE_SERVICE_ACCOUNT_PATH, "utf8"))
     : require("D:/FirebaseKeys/bdu-library-account-finder-firebase-adminsdk-fbsvc-5bd75ebd45.json");
 
 initializeApp({
@@ -66,5 +68,5 @@ app.post("/search", async (req, res) => {
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
